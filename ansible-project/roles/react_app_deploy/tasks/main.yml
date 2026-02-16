@@ -1,0 +1,71 @@
+---
+# 1️⃣ Remove old React app folder (clean clone)
+- name: Remove old React app folder if it exists
+  file:
+    path: "{{ react_app_dest }}"
+    state: absent
+
+# 2️⃣ Clone repository directly at the specified tag
+- name: Clone React app repository at specific tag
+  git:
+    repo: "{{ repo }}"
+    dest: "{{ react_app_dest }}"
+    version: "{{ react_app_tag }}"  # <--- the tag you want to deploy, e.g., v3.0.0
+    force: yes
+    accept_hostkey: yes
+    clone: yes
+    update: no
+
+# 3️⃣ Verify which tag is deployed
+- name: Show deployed React app tag
+  command: git -C "{{ react_app_dest }}" describe --tags
+  register: deployed_version
+
+- name: Print deployed React app tag
+  debug:
+    msg: "Deployed React app version (tag) is {{ deployed_version.stdout }}"
+
+# 4️⃣ Show commit hash (optional but useful)
+- name: Show current commit hash
+  command: git -C "{{ react_app_dest }}" rev-parse HEAD
+  register: deployed_commit
+  
+
+- name: Print deployed commit hash
+  debug:
+    msg: "Deployed commit hash is {{ deployed_commit.stdout }}"
+
+# 5️⃣ Install React dependencies
+- name: Install React dependencies
+  command: npm install --legacy-peer-deps
+  args:
+    chdir: "{{ react_app_dest }}"
+
+# 6️⃣ Build React app
+- name: Build React app
+  command: npm run build
+  args:
+    chdir: "{{ react_app_dest }}"
+
+# 7️⃣ Copy build to Nginx root
+- name: Copy React build to Nginx root
+  copy:
+    src: "{{ react_app_dest }}/build/"
+    dest: "{{ nginx_root }}/"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    remote_src: yes
+
+# 8️⃣ Ensure Nginx is running
+- name: Start and enable Nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes    
+
+# 9️⃣ Restart Nginx to serve the new build
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted

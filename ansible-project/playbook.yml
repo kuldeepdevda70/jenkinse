@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - nginx_react
+    - react_app_deploy
+
+    

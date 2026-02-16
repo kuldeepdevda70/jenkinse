@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    stages {
+        stage('Terraform Apply') {
+            steps {
+                sh 'cd terraform && terraform init && terraform apply -auto-approve'
+            }
+        }
+        stage('Ansible Deploy') {
+            steps {
+                sh 'cd ansible-project && ansible-playbook -i inventory/aws_ec2.yml playbook.yml'
+            }
+        }
+        stage('Test Deployment') {
+            steps {
+                sh 'curl http://<EC2_PUBLIC_IP>'
+                
+            }
+        }
+    }
+}
