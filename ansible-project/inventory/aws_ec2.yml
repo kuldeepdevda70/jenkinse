@@ -10,11 +10,13 @@ filters:
 hostnames:
   - public-ip-address
 
-vars:
-  ansible_user: ubuntu
-  ansible_ssh_private_key_file: /var/lib/jenkins/test.pem
-  ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+compose:
+  ansible_host: public_ip_address
+  ansible_user: "'ubuntu'"
+  ansible_ssh_private_key_file: "'/home/abhishek/Downloads/test.pem'"
 
 keyed_groups:
   - key: tags.Name
     prefix: name
+
+
