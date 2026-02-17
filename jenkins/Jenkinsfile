@@ -1,20 +1,42 @@
 pipeline {
     agent any
+
+    environment {
+        TERRAFORM_DIR = 'terraform'
+        ANSIBLE_DIR   = 'ansible-project'
+    }
+
     stages {
+
         stage('Terraform Apply') {
             steps {
-                sh 'cd terraform && terraform init && terraform apply -auto-approve'
+                echo "Initializing and applying Terraform..."
+                sh """
+                    cd $TERRAFORM_DIR
+                    terraform init
+                    terraform apply -auto-approve
+                """
             }
         }
+
         stage('Ansible Deploy') {
             steps {
-                sh 'cd ansible-project && ansible-playbook -i inventory/aws_ec2.yml playbook.yml'
+                echo "Running Ansible playbook..."
+                sh """
+                    cd $ANSIBLE_DIR
+                    ansible-playbook -i inventory/aws_ec2.yml playbook.yml
+                """
             }
         }
+
         stage('Test Deployment') {
             steps {
-                sh 'curl http://<EC2_PUBLIC_IP>'
-                
+                script {
+                    // Dynamically get public IP from Terraform output
+                    def public_ip = sh(script: "cd $TERRAFORM_DIR && terraform output -raw public_ip", returnStdout: true).trim()
+                    echo "Testing deployment at: http://${public_ip}"
+                    sh "curl http://${public_ip}"
+                }
             }
         }
     }
