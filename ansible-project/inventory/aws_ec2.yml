@@ -6,6 +6,7 @@ filters:
   instance-state-name: running
   "tag:Name": "react-server"
 
+
 hostnames:
   - public-ip-address
 
