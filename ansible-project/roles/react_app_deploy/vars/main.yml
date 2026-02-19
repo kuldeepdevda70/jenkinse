@@ -1,4 +1,4 @@
 repo: "https://github.com/kuldeepdevda70/react-todo-app.git"
 react_app_dest: "/home/ubuntu/react_app"
 nginx_root: "/var/www/html"
-react_app_tag: "v1.0.0" 
+react_app_tag: "master" 
