@@ -13,7 +13,7 @@ hostnames:
 compose:
   ansible_host: public_ip_address
   ansible_user: "'ubuntu'"
-  ansible_ssh_private_key_file: "'/home/abhishek/Downloads/test.pem'"
+  ansible_ssh_private_key_file: "'/var/lib/jenkins/test.pem'"
 
 keyed_groups:
   - key: tags.Name
