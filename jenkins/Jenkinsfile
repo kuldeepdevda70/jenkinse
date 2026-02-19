@@ -1,9 +1,8 @@
 pipeline {
     agent any
 
-    
     environment {
-        TERRAFORM_DIR = 'terraform'
+        TERRAFORM_DIR = 'terraform-module/template/stack'
         ANSIBLE_DIR   = 'ansible-project'
     }
 
@@ -20,6 +19,13 @@ pipeline {
             }
         }
 
+        stage('Wait for EC2') {
+            steps {
+                echo "Waiting for EC2 to be ready..."
+                sh 'sleep 40'
+            }
+        }
+
         stage('Ansible Deploy') {
             steps {
                 echo "Running Ansible playbook..."
@@ -33,7 +39,6 @@ pipeline {
         stage('Test Deployment') {
             steps {
                 script {
-                    // Dynamically get public IP from Terraform output
                     def public_ip = sh(script: "cd $TERRAFORM_DIR && terraform output -raw public_ip", returnStdout: true).trim()
                     echo "Testing deployment at: http://${public_ip}"
                     sh "curl http://${public_ip}"
