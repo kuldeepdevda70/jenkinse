@@ -40,19 +40,5 @@ resource "aws_instance" "react_server" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.react_sg.id]
 
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt update -y
-              sudo apt install git -y
-              sudo apt install ansible -y
-
-              # Clone repo inside EC2
-              git clone ${var.ansible_repo} /home/ubuntu/app
-              cd /home/ubuntu/app
-
-              # Run playbook
-              ansible-playbook playbook.yml
-              EOF
-
   tags = { Name = var.instance_name }
 }
