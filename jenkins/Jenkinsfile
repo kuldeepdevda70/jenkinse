@@ -39,11 +39,15 @@ pipeline {
         stage('Test Deployment') {
             steps {
                 script {
-                    def public_ip = sh(script: "cd $TERRAFORM_DIR && terraform output -raw public_ip", returnStdout: true).trim()
+                    def public_ip = sh(
+                        script: "cd $TERRAFORM_DIR && terraform output -raw ec2_public_ip",
+                        returnStdout: true
+                    ).trim()
                     echo "Testing deployment at: http://${public_ip}"
                     sh "curl http://${public_ip}"
                 }
             }
         }
+
     }
 }
